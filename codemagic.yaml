@@ -20,9 +20,12 @@ workflows:
       - name: Set up code signing
         script: |
           keychain initialize
+          # Generate a fresh private key for the distribution certificate
+          openssl genrsa -out /tmp/apple_cert_priv.pem 2048
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
-            --create
+            --create \
+            --certificate-key=@file:/tmp/apple_cert_priv.pem
           keychain add-certificates
           xcode-project use-profiles
       - name: Bump build number
