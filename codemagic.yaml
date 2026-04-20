@@ -6,9 +6,6 @@ workflows:
     integrations:
       app_store_connect: App Store Connect API Key
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: co.anchorestates
       vars:
         BUNDLE_ID: "co.anchorestates"
       xcode: latest
@@ -31,7 +28,6 @@ workflows:
       - name: Bump build number
         script: |
           cd $CM_BUILD_DIR
-          # Use Codemagic's monotonically-increasing BUILD_NUMBER until an App Store listing exists.
           agvtool new-version -all $(($BUILD_NUMBER + 1))
       - name: Build ipa
         script: |
