@@ -19,8 +19,27 @@ workflows:
           xcodegen generate
       - name: Set up code signing
         script: |
+          set -e
           keychain initialize
-          # Generate a fresh private key for the distribution certificate
+          # Past builds created iOS Distribution certs with ephemeral private keys we
+          # can't recover, and Apple caps at 2 active dist certs — so we must revoke
+          # stale ones before creating a fresh key + cert pair for this build.
+          echo "--- Listing existing iOS_DISTRIBUTION certs ---"
+          LIST_JSON=$(app-store-connect list-certificates --type IOS_DISTRIBUTION --json 2>/dev/null || app-store-connect certificates list --type IOS_DISTRIBUTION --json 2>/dev/null || echo '[]')
+          echo "$LIST_JSON" | python3 -c "import sys, json; data=sys.stdin.read().strip() or '[]'; rows=json.loads(data) if data.startswith('[') else []; print('\\n'.join(r.get('id','') for r in rows if r.get('id')))" > /tmp/cert_ids.txt 2>/dev/null || true
+          if [ -s /tmp/cert_ids.txt ]; then
+            while read cert_id; do
+              [ -z "$cert_id" ] && continue
+              echo "Revoking stale distribution cert: $cert_id"
+              app-store-connect revoke-certificate "$cert_id" 2>/dev/null \
+                || app-store-connect delete-certificate "$cert_id" 2>/dev/null \
+                || app-store-connect certificates delete "$cert_id" 2>/dev/null \
+                || echo "  (could not revoke $cert_id via CLI — continuing)"
+            done < /tmp/cert_ids.txt
+          else
+            echo "No existing dist certs to clean up."
+          fi
+          # Fresh private key, fresh cert, fresh profile — all matched to each other.
           openssl genrsa -out /tmp/apple_cert_priv.pem 2048
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
@@ -31,6 +50,7 @@ workflows:
       - name: Bump build number
         script: |
           cd $CM_BUILD_DIR
+          # Use Codemagic's monotonically-increasing BUILD_NUMBER until an App Store listing exists.
           agvtool new-version -all $(($BUILD_NUMBER + 1))
       - name: Build ipa
         script: |
