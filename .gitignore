@@ -1,0 +1,14 @@
+# Xcode
+build/
+DerivedData/
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+
+# CocoaPods
+Pods/
+
+# Codemagic
+codemagic_export/

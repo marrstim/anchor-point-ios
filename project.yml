@@ -1,0 +1,33 @@
+name: AnchorPoint
+options:
+  bundleIdPrefix: co.anchorestates
+  deploymentTarget:
+    iOS: "15.0"
+  xcodeVersion: "15.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    SWIFT_VERSION: "5.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "15.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+
+targets:
+  AnchorPoint:
+    type: application
+    platform: iOS
+    sources:
+      - AnchorPoint
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: co.anchorestates
+        PRODUCT_NAME: AnchorPoint
+        INFOPLIST_FILE: AnchorPoint/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        SUPPORTS_MACCATALYST: NO
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+        GENERATE_INFOPLIST_FILE: NO
