@@ -4,7 +4,7 @@ import WebKit
 final class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
 
     // The PWA we are wrapping. Change this if the site URL ever moves.
-    private let startURL = URL(string: "https://anchorestates.co")!
+    private let startURL = URL(string: "https://app.anchorestates.co")!
 
     private lazy var webView: WKWebView = {
         let config = WKWebViewConfiguration()
